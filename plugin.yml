@@ -1,6 +1,6 @@
 ---
 name: CustomTNT-PM5
-version: 1.0.0
+version: 1.1.0
 author: ShadowMikado
 main: ShadowMikado\CustomTNT\Main
 api: [5.0.0]
