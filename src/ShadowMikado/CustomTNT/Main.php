@@ -40,12 +40,12 @@ class Main extends PluginBase implements Listener
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
 
         $this->saveDefaultConfig();
-        $this->saveResource("CustomTNT.mcpack");
+        $this->saveResource($this->getConfig()->get("Pack Name"));
         self::$config = $this->getConfig();
 
         $rpManager = $this->getServer()->getResourcePackManager();
-		$rpManager->setResourceStack(array_merge($rpManager->getResourceStack(), [new ZippedResourcePack(Path::join($this->getDataFolder(), "CustomTNT.mcpack"))]));
-		(new \ReflectionProperty($rpManager, "serverForceResources"))->setValue($rpManager, true);
+        $rpManager->setResourceStack(array_merge($rpManager->getResourceStack(), [new ZippedResourcePack(Path::join($this->getDataFolder(), $this->getConfig()->get("Pack Name")))]));
+        (new \ReflectionProperty($rpManager, "serverForceResources"))->setValue($rpManager, true);
 
         $id = BlockTypeIds::newId();
         $config = $this->getConfig();
@@ -67,7 +67,7 @@ class Main extends PluginBase implements Listener
         $model = new Model($materials, $geo, new Vector3(-8, 0, -8), new Vector3(16, 16, 16));
 
         $name = $this->getConfig()->get("Custom Name");
-        CustomiesBlockFactory::getInstance()->registerBlock(static fn () => new CustomTNT(new BlockIdentifier($id), $name, new BlockTypeInfo(new BlockBreakInfo(1))), "customies:" . strtolower(str_replace(" ", "_", $name)), $model, new CreativeInventoryInfo(CreativeInventoryInfo::CATEGORY_ITEMS, CreativeInventoryInfo::NONE));
+        CustomiesBlockFactory::getInstance()->registerBlock(static fn () => new CustomTNT(new BlockIdentifier($id), $name, new BlockTypeInfo(new BlockBreakInfo(0.0))), "customies:" . strtolower(str_replace(" ", "_", $name)), $model, new CreativeInventoryInfo(CreativeInventoryInfo::CATEGORY_ITEMS, CreativeInventoryInfo::NONE));
 
         EntityFactory::getInstance()->register(CustomPrimedTNT::class, function (World $world, CompoundTag $nbt): CustomPrimedTNT {
             return new CustomPrimedTNT(EntityDataHelper::parseLocation($nbt, $world), $nbt);
