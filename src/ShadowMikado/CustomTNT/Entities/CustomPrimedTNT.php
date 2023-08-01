@@ -13,13 +13,14 @@ use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\world\Explosion;
 use pocketmine\world\Position;
+use ShadowMikado\CustomTNT\Explosions\BasicExplosion;
+use ShadowMikado\CustomTNT\Explosions\SphericalExplosion;
 use ShadowMikado\CustomTNT\Main;
 
 class CustomPrimedTNT extends Entity implements Explosive
 {
-	private const TAG_FUSE = "Fuse"; //TAG_Short
+	private const TAG_FUSE = "Fuse";
 
 
 	public static function getNetworkTypeId(): string
@@ -130,12 +131,25 @@ class CustomPrimedTNT extends Entity implements Explosive
 		$ev->call();
 		if (!$ev->isCancelled()) {
 			$ev->setRadius(Main::$config->get("Explosion Radius"));
-			//TODO: deal with underwater TNT (underwater TNT treats water as if it has a blast resistance of 0)
-			$explosion = new Explosion(Position::fromObject($this->location->add(0, $this->size->getHeight() / 2, 0), $this->getWorld()), $ev->getRadius(), $this);
-			if ($ev->isBlockBreaking()) {
-				$explosion->explodeA();
+			if (Main::$config->get("Shape") === "spherical") {
+				$explosion = new SphericalExplosion(Position::fromObject($this->location->add(0, $this->size->getHeight() / 2, 0), $this->getWorld()), $ev->getRadius(), $this);
+				if ($ev->isBlockBreaking()) {
+					$explosion->explodeA();
+				}
+				$explosion->explodeB();
+			} elseif (Main::$config->get("Shape") === "basic") {
+				$explosion = new BasicExplosion(Position::fromObject($this->location->add(0, $this->size->getHeight() / 2, 0), $this->getWorld()), $ev->getRadius(), $this);
+				if ($ev->isBlockBreaking()) {
+					$explosion->explodeA();
+				}
+				$explosion->explodeB();
+			} else {
+				$explosion = new BasicExplosion(Position::fromObject($this->location->add(0, $this->size->getHeight() / 2, 0), $this->getWorld()), $ev->getRadius(), $this);
+				if ($ev->isBlockBreaking()) {
+					$explosion->explodeA();
+				}
+				$explosion->explodeB();
 			}
-			$explosion->explodeB();
 		}
 	}
 
